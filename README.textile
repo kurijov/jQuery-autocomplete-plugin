@@ -1,1 +1,28 @@
 This is *jQuery* autocomplete plugin
+
+*Usage example*
+
+<pre>
+var options = {
+	varName: 'input',
+	requestType: 'GET',
+	
+	url: siteURL + "/users/ajax_search?",
+	
+	selected: function(item, obj)
+	{
+		var userContainer = $('#user_' + obj.id);
+		if (!userContainer.length) {
+			$('#userListContainer').append(obj.userHtml);
+			$('#users').val('');
+		}
+	},
+	
+	parseItem: function(item)
+	{
+		return item.value;
+	}
+};
+
+$("#users").autocomplete(options);
+</pre>
