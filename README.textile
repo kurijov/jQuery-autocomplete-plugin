@@ -9,6 +9,10 @@ var options = {
 	
 	url: siteURL + "/users/ajax_search?",
 	
+	/**
+	 * var item - clicked item (html objected extended by jQuery)
+	 * var obj - clicked object (initial object used for rendering of autocomplete items) 
+	 */
 	selected: function(item, obj)
 	{
 		var userContainer = $('#user_' + obj.id);
@@ -18,6 +22,10 @@ var options = {
 		}
 	},
 	
+	/**
+	 * var @item - object from response 
+	 * returns value used for rendering of each autocomplete item 
+	 */
 	parseItem: function(item)
 	{
 		return item.value;
@@ -26,3 +34,5 @@ var options = {
 
 $("#users").autocomplete(options);
 </pre>
+
+In order to get it work you have to response *array of objects* in *json* encoded string. 
