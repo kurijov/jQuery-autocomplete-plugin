@@ -5,4 +5,4 @@ div.itemsContainer {
 }
 
 div.itemsContainer div.autocompleteItem {cursor: pointer; padding: 3px;background: white}
-div.itemsContainer div.autocompleteItem:hover {background: silver}
+div.itemsContainer div.selected {background: #f6f8ff}

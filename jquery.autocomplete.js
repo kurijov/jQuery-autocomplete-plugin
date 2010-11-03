@@ -8,7 +8,13 @@
 	$.fn.extend({
 		autocomplete: function(options) {
 			options.iniciator = $(this);
-			options = $.extend({}, options);
+			options = $.extend({
+				attachToBox: false
+			}, options);
+			
+			if (options.attachToBox == false)
+				options.attachToBox = options.iniciator;
+			
 			$.autocomplete.options = options;
 			var inputs = $(options.iniciator);
 			
@@ -20,26 +26,102 @@
 	});
 	
 	var autocompleter = function() {
-		this._input = false;
-		this._timer = false;
-		this._cache = new Array();
-		var autocomplete = this;
+		this._input 		= false;
+		this._timer 		= false;
+		this._cache 		= new Array();
+		this._selectedItem 	= false;
+		var autocomplete 	= this;
 		
 		this.observe = function(input)
 		{
 			autocomplete._input = input;
-			input.keyup(function() {
+			
+			input.keydown(function(e) {
+				if (e.keyCode == 13 && autocomplete._selectedItem != false) {
+					e.preventDefault();
+					autocomplete._selectedItem.trigger('selected:event');
+				}
+			});
+			
+			input.keyup(function(e) {
+				switch (e.keyCode) {
+					case 13:
+						return;
+						break;
+						
+					case 40://down
+						e.preventDefault();
+						autocomplete.selectNextItem();
+						return;
+						break;
+						
+					case 38://up
+						e.preventDefault();
+						autocomplete.selectPreviousItem();
+						return;
+						break;
+				}
+				
+				if (input.val() == '') {
+					autocomplete._getContainer().trigger('hide:event');
+					return;
+				}
+				
 				autocomplete.getData(input.val(), function(data) {
 					autocomplete.draw(data);
 				});
 			});
 		}
 		
+		this.selectNextItem = function()
+		{
+			var item = this._selectedItem;
+			if (item == false) {
+				item = this._getContainer().find('div.autocompleteItem:first');
+				this._selectItem(item);
+			} else {
+				var nextItem = item.next();
+				if (nextItem.length)
+					this._selectItem(nextItem);
+			}
+		}
+		
+		this.selectPreviousItem = function()
+		{
+			var item = this._selectedItem;
+			if (item == false) {
+				item = this._getContainer().find('div.autocompleteItem:last');
+				this._selectItem(item);
+			} else {
+				var prevItem = item.prev();
+				if (prevItem.length)
+					this._selectItem(prevItem);
+			}
+		}
+		
+		this._selectItem = function(item)
+		{
+			if (this._selectedItem !== false)
+				this._selectedItem.removeClass('selected');
+			
+			this._selectedItem = item;
+			item.addClass('selected');
+		}
+		
+		this._deselectItem = function(item)
+		{
+			if (this._selectedItem !== false)
+				this._selectedItem.removeClass('selected');
+			
+			item.removeClass('selected');
+			this._selectedItem = false;
+		}
+		
 		this.getData = function(term, callback)
 		{
 			if (term in autocomplete._cache) {
 				var data = autocomplete._cache[term];
-				callback ? callback.call(null, data) : fase;
+				callback ? callback.call(null, data) : false;
 				return;
 			}
 			
@@ -70,16 +152,31 @@
 		this.draw = function(data)
 		{
 			var itemsContainer = this._getContainer();
+			itemsContainer.html('');
+			this._selectedItem = false;
+			if (data.length == 0)
+				itemsContainer.html('Nothing found...');
 			
 			$.each(data, function() {
 				var item = this;
 				var _div = $('<div class="autocompleteItem">' + item.html + '</div>');
 				itemsContainer.append(_div);
-				_div.bind('selected:event', function() {
-					$.autocomplete.options.selected.call(null, this, item.obj);
+				_div.bind('selected:event', function(e) {
+					autocomplete._selectedItem = false;
+					$.autocomplete.options.selected.call(autocomplete._input, this, item.obj, e);
 					itemsContainer.trigger('hide:event');
 				});
-				_div.click(function() {
+				
+				_div.mouseover(function() {
+					autocomplete._selectItem($(this));
+				});
+				
+				_div.mouseout(function() {
+					autocomplete._deselectItem($(this));
+				});
+				
+				_div.click(function(e) {
+					e.stopPropagation();
 					_div.trigger('selected:event');
 				});
 			});
@@ -89,9 +186,11 @@
 		
 		this._getContainer = function()
 		{
-			var width 			= this._input.outerWidth();
-			var height 			= this._input.outerHeight();
-			var offset			= this._input.offset();
+			var attachToBox 	= $.autocomplete.options.attachToBox;
+			
+			var width 			= attachToBox.width();
+			var height 			= attachToBox.outerHeight();
+			var offset			= attachToBox.offset();
 			var itemsContainer	= $('#itemsContainer');
 			if (!itemsContainer.length) {
 				var itemsContainer	= $('<div id="itemsContainer" class="itemsContainer"></div>');
@@ -103,15 +202,15 @@
 				body.click(function() {
 					itemsContainer.trigger('hide:event');
 				});
+				
+				itemsContainer.hide();
+				itemsContainer.html('');
 			}
-			
-			itemsContainer.html('');
 			
 			itemsContainer.css({
 				width: width,
 				left: offset.left,
-				top: offset.top + height,
-				display: 'none'
+				top: offset.top + height
 			});
 			
 			return itemsContainer;
