@@ -13,6 +13,7 @@
 				preFormatData: function(data) {
 					return data;
 				},
+				requestType: 'GET',
 				afterDraw: function() {}
 			}, options);
 			
@@ -135,7 +136,7 @@
 				container.html('Loading...');
 				container.show();
 				$.ajax({
-					type: $.autocomplete.options.requestType ? $.autocomplete.options.requestType : 'GET',
+					type: $.autocomplete.options.requestType,
 					url: $.autocomplete.options.url,
 					data: $.autocomplete.options.varName + '=' + autocomplete._input.val(),
 					dataType:'json',
