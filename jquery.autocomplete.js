@@ -140,9 +140,9 @@
 					data: $.autocomplete.options.varName + '=' + autocomplete._input.val(),
 					dataType:'json',
 					success: function(result){
-						var initialData = result;
-						result = $.autocomplete.options.preFormatData(result);
-						var parsedHtml = [];
+						var initialData 	= result;
+						result 				= $.autocomplete.options.preFormatData(result);
+						var parsedHtml 		= [];
 						$.each(result, function() {
 							var _html = $.autocomplete.options.parseItem.call(null, this);
 							parsedHtml[parsedHtml.length] = {html:_html, obj: this};
