@@ -1,0 +1,9 @@
+sftp root@lodoss.org <<SCRIPT
+mkdir /var/www/subdomains/test/mike.autocomplete/
+mkdir /var/www/subdomains/test/mike.autocomplete/css
+mkdir /var/www/subdomains/test/mike.autocomplete/js
+cd /var/www/subdomains/test/mike.autocomplete/
+put -r *
+rm /var/www/subdomains/test/mike.autocomplete/upload.script
+quit
+SCRIPT

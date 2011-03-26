@@ -1,0 +1,17 @@
+{
+	"title": "SiteManager: units, tenants, colleagues and vendors",
+	"items": [
+									{
+				"id": "1181",
+				"type": "unit",
+				"address": "521 Nogales, Los Angeles, CA 93117",
+				"email": ""
+		   } ,										{
+				"id": "1439",
+				"type": "colleague",
+				"name": "mike newman",
+				"phone": "",
+				"email": "mike@rehproperty.com"
+
+		   } 										]
+}
